@@ -1,28 +1,45 @@
+
 name: Checks
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-  workflow_dispatch:
+on: [push]
 
 jobs:
   test-lint:
     name: Test and Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Test
         run: docker compose run --rm app sh -c "python manage.py test"
-
       - name: Lint
         run: docker compose run --rm app sh -c "flake8"
+
+
+
+# This YAML code defines a GitHub Actions workflow named "Checks" that automatically runs two jobs, "Test" and "Lint," whenever code is pushed to the main or develop branches, or manually triggered via workflow_dispatch [1]. 
+# Here is a breakdown of the key components:
+# Workflow Triggers (on)
+# push: The workflow starts automatically when new code is pushed (committed) to the specified branches: main and develop [1].
+# workflow_dispatch: Allows you to manually trigger this workflow from the "Actions" tab in your GitHub repository's web interface [1]. 
+# Job Definition (jobs: test-lint)
+# This workflow contains one main job named test-lint. 
+# runs-on: ubuntu-latest: Specifies that this job will execute on a fresh, temporary virtual machine running the latest version of the Ubuntu operating system provided by GitHub [1].
+# steps: The sequence of commands the job executes. 
+# Steps Breakdown
+# Login to Docker Hub:
+# This step uses a pre-built GitHub action (docker/login-action@v2) to authenticate with Docker Hub. It securely retrieves sensitive credentials (username and personal access token) from your repository's secrets using secrets.DOCKERHUB_USER and secrets.DOCKERHUB_TOKEN [1]. This is necessary if your project uses private Docker images.
+# Checkout:
+# This step uses the standard GitHub action actions/checkout@v4 to download your repository's code onto the Ubuntu virtual machine so subsequent steps can access the project files [1].
+# Test:
+# This step executes your unit tests.
+# It uses docker compose run --rm app sh -c "python manage.py test" to start a service named app defined in your docker-compose.yml file, run the Django test command (python manage.py test) inside that container, and then automatically remove the container (--rm) once finished.
+# Lint:
+# This step runs a linter (Flake8) to check your Python code for style compliance and potential errors.
+# It uses the same docker compose run --rm app sh -c "flake8" pattern to execute the linting command within your isolated Docker environment. 
+# In summary, this workflow ensures that every time changes are proposed for the main branches, the codebase is automatically checked for both functional correctness (tests pass) and code quality/style (linting passes) before integration [1]

@@ -1,32 +1,43 @@
-FROM  python:3.9-alpine3.13
+#this Dockerfile uses an official Python runtime as a parent image
 
-LABEL maintainer="itsjayesh"
+FROM python:3.9-alpine3.13 
 
-ENV PYTHONUNBUFFERED=1
+#LABEL description="This is a Dockerfile for Recipe App API"
+LABEL maintainer="jayesh.com"
+# Set environment variables
+ENV PYTHONUNBUFFERED 1 
+#to ensure that the Python output is sent straight to terminal (e.g., your container log) without being buffered
+ENV PYTHONDONTWRITEBYTECODE 1 
+#to prevent Python from writing .pyc
 
-COPY ./requirements.txt  /tmp/requirements.txt
-COPY ./requirements.dev.txt  /tmp/requirements.dev.txt
+COPY ./requirements.txt /tmp/requirements.txt
+COPY ./requirements.dev.txt /tmp/requirements.dev.txt
 
-COPY ./app /app 
+COPY ./app /app
 
 WORKDIR /app
-
 EXPOSE 8000
 
-ARG DEV=false
+# Build argument to specify development mode
+ARG DEV=false 
 
+# Create a virtual environment and install dependencies
+# Use a virtual environment to isolate dependencies
+# Create a non-root user to run the application
+# Switch to the non-root user
+# Final stage: set up the application
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     /py/bin/pip install -r /tmp/requirements.txt && \
-    if [ $DEV = "true"]; \
-        then /py/bin/pip install -r  /tmp/requirements.dev.txt ; \
-    fi && \
+    if [ "$DEV" = "true" ] ; then /py/bin/pip install -r /tmp/requirements.dev.txt ; fi && \
     rm -rf /tmp && \
     adduser \
         --disabled-password \
         --no-create-home \
         django-user
 
+
+# Update PATH environment variable
 ENV PATH="/py/bin:$PATH"
 
 USER django-user

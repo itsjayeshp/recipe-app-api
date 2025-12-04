@@ -1,8 +1,12 @@
-
 [flake8]
-exclude = 
-    migrations,
-    __pycache__,
+exclude =
+    migrations/,
     manage.py,
-    settings.py
-
+    settings.py,
+    .git,
+    __pycache__,
+    env/,
+    venv/,
+    .venv/,
+    build/,
+    dist/
