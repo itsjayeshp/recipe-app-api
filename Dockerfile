@@ -26,12 +26,18 @@ ARG DEV=false
 # Create a non-root user to run the application
 # Switch to the non-root user
 # Final stage: set up the application
+# Upgrade pip to the latest version line 2
+#for PostgreSQL database client this will help to connect to PostgreSQL database line 3
+# temporary build dependencies for compiling packages. why because some packages have C extensions that need to be compiled during installation line 4
+# Install production dependencies from requirements.txt line 5
+# this line is for temporary build dependencies musl-dev is for C standard library
+# this line is for development dependencies
 RUN python -m venv /py && \
-    /py/bin/pip install --upgrade pip && \
-    apk add --update --no-cache postgresql-client && \
-    apk add --update --no-cache --virtual .tmp-build-deps \
-        build-base postgresql-dev musl-dev && \
-    /py/bin/pip install -r /tmp/requirements.txt && \
+    /py/bin/pip install --upgrade pip && \ 
+    apk add --update --no-cache postgresql-client && \ 
+    apk add --update --no-cache --virtual .tmp-build-deps \ 
+        build-base postgresql-dev musl-dev && \ 
+    /py/bin/pip install -r /tmp/requirements.txt && \ 
     if [ "$DEV" = "true" ] ; then /py/bin/pip install -r /tmp/requirements.dev.txt ; fi && \
     rm -rf /tmp && \
     apk del .tmp-build-deps && \
@@ -45,3 +51,5 @@ RUN python -m venv /py && \
 ENV PATH="/py/bin:$PATH"
 
 USER django-user
+
+
