@@ -2,7 +2,6 @@
 Views for recipe api
 """
 
-
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -24,10 +23,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         """Return serializer class for request."""
-        if self.action == 'list':
+        if self.action == "list":
             return serializers.RecipeSerializer
         return self.serializer_class
 
     def perform_create(self, serializer):
         """Create and return a recipe."""
-        serializer.save(user=self.request.user) 
+        serializer.save(user=self.request.user)
